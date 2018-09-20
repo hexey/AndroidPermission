@@ -27,6 +27,12 @@ val apr = APermission(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
 apr.request(context) { result ->
     if (result.isAllGranted) {
         // todo
+    } else {
+        result.forEach { permission: Permission ->
+            if (!permission.isGranted) {
+                Log.w("Permission", "Permission ${permission.name} is denied")
+            }
+        }
     }
 }
 
