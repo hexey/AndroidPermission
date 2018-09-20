@@ -3,9 +3,7 @@
 [![License Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=true)](http://www.apache.org/licenses/LICENSE-2.0)
 ![minSdkVersion 16](https://img.shields.io/badge/minSdkVersion-16-red.svg?style=true)
 
-:white_check_mark: Support running outside of Activity
-
-:white_check_mark: No fragment state loss problem
+:white_check_mark: Support request permission outside of Activity
 
 :white_check_mark: Simple as it should be
 
@@ -18,21 +16,33 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.hexey.permission:core:0.1.0"
+    implementation "com.github.hexey.permission:core:0.2.0"
 }
 ```
 
 Usage
 ---------------
 ```kotlin
-APermission(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE).request(this) { result ->
+val apr = APermission(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
+apr.request(context) { result ->
     if (result.isAllGranted) {
         // todo
     }
 }
+
+
+apr.onGranted(context) {
+    // todo
+}.onDenied(context) {
+    // todo
+}
+
+
+view.onClick(apr, lifecycle) {
+    assert(lifecycle.currentState == Lifecycle.State.RESUMED)
+    // todo
+}
 ```
-
-
 
 License
 =======

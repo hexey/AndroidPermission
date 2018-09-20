@@ -10,7 +10,7 @@ ext {
     siteUrl = 'https://github.com/hexey/AndroidPermission'
     gitUrl = 'https://github.com/hexey/AndroidPermission.git'
 
-    libraryVersion = '0.1.0'
+    libraryVersion = '0.2.0'
 
     developerId = 'hexey'
     developerName = 'Hexey'

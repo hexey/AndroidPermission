@@ -16,13 +16,14 @@
 
 package com.github.hexey.permission
 
+import android.Manifest
 import android.Manifest.permission.*
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso
+import android.view.View
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import java.lang.AssertionError
 import java.util.concurrent.CountDownLatch
 
 
@@ -89,7 +90,6 @@ class APermissionTest {
         }
     }
 
-
     @Test
     fun allDenied() {
         val latch = CountDownLatch(1)
@@ -150,6 +150,129 @@ class APermissionTest {
 
         latch.await()
     }
+
+    @Test
+    fun onGranted() {
+        val latch = CountDownLatch(1)
+        onMainThread {
+            APermission(
+                READ_EXTERNAL_STORAGE,
+                WRITE_EXTERNAL_STORAGE,
+                READ_CALENDAR
+            ).onGranted(context) {
+                latch.countDown()
+            }.onDenied(context) {
+                throw AssertionError()
+            }
+        }
+
+        PermissionGranter.allowPermissionsIfNeeded(WRITE_EXTERNAL_STORAGE)
+        PermissionGranter.allowPermissionsIfNeeded(READ_CALENDAR)
+
+        latch.await()
+    }
+
+    @Test
+    fun onDenied() {
+        val latch = CountDownLatch(1)
+        onMainThread {
+            APermission(
+                READ_EXTERNAL_STORAGE,
+                WRITE_EXTERNAL_STORAGE,
+                READ_CALENDAR
+            ).onGranted(context) {
+                throw AssertionError()
+            }.onDenied(context) {
+                latch.countDown()
+            }
+        }
+
+        PermissionGranter.allowPermissionsIfNeeded(WRITE_EXTERNAL_STORAGE)
+        PermissionGranter.deniedPermissions(READ_CALENDAR)
+
+        latch.await()
+    }
+
+    @Test
+    fun onClickGranted() {
+        val latch = CountDownLatch(1)
+        var callCount = 0
+        onMainThread {
+            val view = View(context)
+            val apr = APermission(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_CALENDAR
+            )
+            view.onClick(apr) {
+                callCount++
+                latch.countDown()
+            }
+            view.performClick()
+            view.performClick()
+            view.performClick()
+            Unit
+        }
+
+        PermissionGranter.allowPermissionsIfNeeded(WRITE_EXTERNAL_STORAGE)
+        PermissionGranter.allowPermissionsIfNeeded(READ_CALENDAR)
+        latch.await()
+        onMainThread {
+            assertEquals(1, callCount)
+        }
+    }
+
+    @Test
+    fun onClickGrantedWithLifecycleResume() {
+        val latch = CountDownLatch(1)
+        onMainThread {
+            val view = View(context)
+            val lifecycle = SimpleLifecycleOwner()
+            lifecycle.resume()
+
+            view.onClick(APermission(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_CALENDAR
+            ), lifecycle) {
+                latch.countDown()
+            }
+            view.performClick()
+            Unit
+        }
+
+        PermissionGranter.allowPermissionsIfNeeded(WRITE_EXTERNAL_STORAGE)
+        PermissionGranter.allowPermissionsIfNeeded(READ_CALENDAR)
+        latch.await()
+    }
+
+    @Test
+    fun onClickGrantedWithLifecycleStop() {
+
+        val lifecycle = SimpleLifecycleOwner()
+
+        onMainThread {
+            val view = View(context)
+            lifecycle.resume()
+
+            view.onClick(APermission(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_CALENDAR
+            ), lifecycle) {
+                throw AssertionError()
+            }
+            view.performClick()
+            Unit
+        }
+        onMainThread { lifecycle.stop() }
+
+        PermissionGranter.allowPermissionsIfNeeded(WRITE_EXTERNAL_STORAGE)
+        PermissionGranter.allowPermissionsIfNeeded(READ_CALENDAR)
+
+        Thread.sleep(500)
+    }
+
 
     private fun revokePermission(permission: String) {
         val context = InstrumentationRegistry.getTargetContext()

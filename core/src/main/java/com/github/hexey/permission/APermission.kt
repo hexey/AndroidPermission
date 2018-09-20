@@ -24,11 +24,6 @@ import android.os.Looper
 import android.support.annotation.MainThread
 import java.util.NoSuchElementException
 import kotlin.collections.ArrayList
-import kotlin.collections.Iterable
-import kotlin.collections.Iterator
-import kotlin.collections.all
-import kotlin.collections.forEach
-import kotlin.collections.isEmpty
 
 typealias Callback = (result: APermission.Result) -> Unit
 
@@ -62,6 +57,12 @@ class APermission(private vararg val permissions: String) {
             callback(Result(permissions, null))
             return
         }
+
+        if (callbacks.isNotEmpty()) { // requesting
+            callbacks.add(callback)
+            return
+        }
+
         allGranted = permissions.all {
             context.checkSelfPermission(it) == PERMISSION_GRANTED
         }
@@ -71,14 +72,31 @@ class APermission(private vararg val permissions: String) {
         }
 
         callbacks.add(callback)
-        if (callbacks.size == 1) {
-            PermissionRequestActivity.startRequest(context, permissions) { result ->
-                allGranted = result.isAllGranted
-                callbacks.forEach { it(result) }
-                callbacks.clear()
-            }
+        PermissionRequestActivity.startRequest(context, permissions) { result ->
+            allGranted = result.isAllGranted
+            callbacks.forEach { it(result) }
+            callbacks.clear()
         }
     }
+
+    @MainThread
+    inline fun onGranted(context: Context, @MainThread
+    crossinline onGranted: () -> Unit): APermission {
+        request(context) {
+            if (it.isAllGranted) onGranted()
+        }
+        return this
+    }
+
+    @MainThread
+    inline fun onDenied(context: Context, @MainThread
+    crossinline onDenied: () -> Unit): APermission {
+        request(context) {
+            if (!it.isAllGranted) onDenied()
+        }
+        return this
+    }
+
 
     class Result(
         private val permissions: Array<out String>,

@@ -35,5 +35,6 @@ dependencies {
     implementation deps.support.support
     implementation deps.support.compat
 
-    implementation "com.github.hexey.permission:rxjava2-extensions:0.1.0"
+    implementation project(':core')
+    //implementation "com.github.hexey.permission:rxjava2-extensions:0.2.0"
 }
