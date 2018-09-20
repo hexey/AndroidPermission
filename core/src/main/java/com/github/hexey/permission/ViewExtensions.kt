@@ -20,6 +20,7 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleOwner
 import android.support.annotation.MainThread
 import android.view.View
+import java.lang.ref.WeakReference
 
 /**
  * AndroidPermission
@@ -38,15 +39,17 @@ fun View.onClick(
 
         this.isRequesting = true
 
+        val viewReference = WeakReference(this)
+
         permissionRequest.onGranted(context) {
             if (lifecycle != null) {
                 lifecycle.lifecycle.doWhenResumed {
                     onClick()
-                    this.isRequesting = false
+                    viewReference.get()?.isRequesting = false
                 }
             } else {
                 onClick()
-                this.isRequesting = false
+                viewReference.get()?.isRequesting = false
             }
         }
     }
