@@ -1,0 +1,61 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
+
+        consumerProguardFiles 'proguard-rules.pro'
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dataBinding { enabled = true }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+}
+
+dependencies {
+    implementation deps.kotlin.stdlib
+    api project(path: ':core')
+
+    api deps.reactivex.rxjava
+    api deps.reactivex.rxandroid
+
+    //region Test
+    testImplementation deps.test.junit
+
+    androidTestImplementation deps.test.runner
+    androidTestImplementation deps.test.rules
+    androidTestImplementation deps.test.espresso_core
+    androidTestImplementation deps.test.espresso_contrib
+    androidTestImplementation deps.test.hamcrest
+    androidTestImplementation deps.test.uiautomator
+    androidTestImplementation('com.schibsted.spain:barista:2.6.0') {
+        exclude group: 'com.android.support'
+        exclude group: 'org.jetbrains.kotlin'
+    }
+    //endregion
+}
+
+
+ext {
+    artifact = 'rxjava2-extensions'
+}
+apply from: rootProject.file('gradle/install.gradle')
+apply from: rootProject.file('gradle/bintray-push.gradle')

@@ -1,0 +1,71 @@
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'com.github.hexey.permission'
+
+    publishedGroupId = 'com.github.hexey.permission'
+    libraryName = 'Android Permission'
+
+    libraryDescription = "Hexey's android permission library"
+
+    siteUrl = 'https://github.com/hexey/AndroidPermission'
+    gitUrl = 'https://github.com/hexey/AndroidPermission.git'
+
+    libraryVersion = '0.1.0'
+
+    developerId = 'hexey'
+    developerName = 'Hexey'
+    developerEmail = 'hexe.world@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+ext.versions = [
+    'compileSdk'    : global_compileSdk as int,
+    'buildTools'    : global_buildTools,
+    'minSdk'        : 19,
+    'supportLibrary': global_versions_supportLibrary,
+    'constraint'    : global_versions_constraint_layout,
+    'kotlin'        : global_versions_kotlin,
+    'espresso'      : global_versions_espresso,
+]
+
+ext.deps = [
+    'support'  : [
+        'support'    : "com.android.support:support-v4:${versions.supportLibrary}",
+        'compat'     : "com.android.support:appcompat-v7:${versions.supportLibrary}",
+        'design'     : "com.android.support:design:${versions.supportLibrary}",
+        'constraint' : "com.android.support.constraint:constraint-layout:${versions.constraint}",
+        'annotations': "com.android.support:support-annotations:${versions.supportLibrary}",
+    ],
+    'kotlin'   : [
+        'stdlib': "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
+    ],
+    'kapt'     : [
+        'databinding': "com.android.databinding:compiler:$global_android_gradle",
+    ],
+    'reactivex': [
+        'rxjava'   : "io.reactivex.rxjava2:rxjava:$global_versions_rxjava",
+        'rxandroid': "io.reactivex.rxjava2:rxandroid:$global_versions_rxandroid",
+    ],
+    'koptional': [
+        'core'              : 'com.gojuno.koptional:koptional:1.5.0',
+        'rxjava2_extensions': 'com.gojuno.koptional:koptional-rxjava2-extensions:1.5.0',
+    ],
+    'test'     : [
+        'junit'           : "junit:junit:4.12",
+        'mockito'         : "org.mockito:mockito-core:$global_versions_mockito",
+        'mockk'           : "io.mockk:mockk:$global_versions_mockk",
+        'robolectric'     : "org.robolectric:robolectric:3.8",
+        'runner'          : 'com.android.support.test:runner:1.0.2',
+        'rules'           : 'com.android.support.test:rules:1.0.2',
+        'espresso_core'   : "com.android.support.test.espresso:espresso-core:${versions.espresso}",
+        'espresso_idling' : "com.android.support.test.espresso:espresso-idling-resource:${versions.espresso}",
+        'espresso_intents': "com.android.support.test.espresso:espresso-intents:${versions.espresso}",
+        'espresso_contrib': "com.android.support.test.espresso:espresso-contrib:${versions.espresso}",
+        'espresso_web'    : "com.android.support.test.espresso:espresso-web:${versions.espresso}",
+        'uiautomator'     : "com.android.support.test.uiautomator:uiautomator-v18:2.1.3",
+        'hamcrest'        : 'org.hamcrest:hamcrest-library:1.3',
+    ],
+]
