@@ -16,15 +16,16 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.hexey.permission:core:0.2.0"
+    implementation "com.github.hexey.permission:core:0.2.1"
 }
 ```
 
 Usage
 ---------------
 ```kotlin
-val apr = APermission(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
-apr.request(context) { result ->
+val storagePermission = APermission(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE)
+
+storagePermission.request(context) { result ->
     if (result.isAllGranted) {
         // todo
     } else {
@@ -37,18 +38,64 @@ apr.request(context) { result ->
 }
 
 
-apr.onGranted(context) {
+storagePermission.onGranted(context) {
     // todo
 }.onDenied(context) {
     // todo
 }
 
 
-view.onClick(apr, lifecycle) {
+view.onClick(storagePermission, lifecycle) {
     assert(lifecycle.currentState == Lifecycle.State.RESUMED)
     // todo
 }
 ```
+```kotlin
+class DemoFragment : Fragment() {
+
+    init {
+        retainInstance = true
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.activity_main, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.onClick(storagePermission, this) {
+            Log.i("Permission", "Granted")
+            assert(lifecycle.currentState == Lifecycle.State.RESUMED)
+            assert(!isStateSaved)
+            fragmentManager.beginTransaction()
+                .replace(android.R.id.content, SomeFragment())
+                .commit()
+        }
+    }
+
+}
+```
+
+Careful! state may change before calling the callback
+---------------
+```kotlin
+class DoNotDoThisActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            storagePermission.onGranted(this) {
+                // Don’t do this
+                // Activity may already destroyed now
+                supportFragmentManager.beginTransaction()
+                    .replace(android.R.id.content, DemoFragment())
+                    .commit()
+            }
+        }
+    }
+}
+```
+This library can't help you with similar case, you may want try other library ( for example: [**PermissionsDispatcher**](https://github.com/permissions-dispatcher/PermissionsDispatcher)) or just do this by original way
+
 
 License
 =======
