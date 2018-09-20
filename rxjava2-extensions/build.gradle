@@ -37,7 +37,7 @@ dependencies {
     api deps.reactivex.rxjava
     api deps.reactivex.rxandroid
 
-    //region Test
+    //region test
     testImplementation deps.test.junit
 
     androidTestImplementation deps.test.runner
@@ -57,5 +57,4 @@ dependencies {
 ext {
     artifact = 'rxjava2-extensions'
 }
-apply from: rootProject.file('gradle/install.gradle')
-apply from: rootProject.file('gradle/bintray-push.gradle')
+apply from: rootProject.file('gradle/push.gradle')

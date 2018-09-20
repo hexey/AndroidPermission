@@ -35,7 +35,7 @@ dependencies {
     implementation deps.support.support
     implementation deps.support.compat
 
-
+    //region test
     testImplementation deps.test.junit
 
     androidTestImplementation deps.test.runner
@@ -48,11 +48,11 @@ dependencies {
         exclude group: 'com.android.support'
         exclude group: 'org.jetbrains.kotlin'
     }
+    //endregion
 }
 
 ext {
     artifact = 'core'
 }
 
-apply from: rootProject.file('gradle/install.gradle')
-apply from: rootProject.file('gradle/bintray-push.gradle')
+apply from: rootProject.file('gradle/push.gradle')

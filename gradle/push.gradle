@@ -1,0 +1,4 @@
+apply from: rootProject.file('gradle/install.gradle')
+apply from: rootProject.file('gradle/bintray-push.gradle')
+
+bintrayUpload.dependsOn install
